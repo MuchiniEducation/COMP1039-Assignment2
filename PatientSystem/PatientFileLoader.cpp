@@ -14,12 +14,93 @@ using namespace std;
 
 std::vector<Patient*> PatientFileLoader::loadPatientFile(const std::string& file)
 {
-	vector<Patient*> patients{};
+    vector<Patient*> patients{};
 
-    std::ifstream inFile(file);
-    if (inFile.is_open()) {
-        // TODO: load your file here
+    ifstream inFile(file);
+
+    if (!inFile.is_open()) {
+        cout << "Could not open patient file: " << file << endl;
+        return patients;
     }
 
+    string line{};
+
+    while (getline(inFile, line)) {
+        if (line.empty()) {
+            continue;
+        }
+
+        stringstream lineStream{ line };
+
+        string uid{};
+        string name{};
+        string birthdayString{};
+        string diagnosis{};
+        string vitalsString{};
+
+        getline(lineStream, uid, '|');
+        getline(lineStream, name, '|');
+        getline(lineStream, birthdayString, '|');
+        getline(lineStream, diagnosis, '|');
+        getline(lineStream, vitalsString, '|');
+
+        stringstream nameStream{ name };
+
+        string lastName{};
+        string firstName{};
+
+        getline(nameStream, lastName, ',');
+        getline(nameStream, firstName, ',');
+
+        tm birthday{};
+        stringstream birthdayStream{ birthdayString };
+        birthdayStream >> get_time(&birthday, "%d-%m-%Y");
+
+        Patient* patient = new Patient(firstName, lastName, birthday);
+        patient->addDiagnosis(diagnosis);
+
+        if (!vitalsString.empty()) {
+            stringstream vitalsRecordsStream{ vitalsString };
+            string vitalsRecord{};
+
+            while (getline(vitalsRecordsStream, vitalsRecord, ';')) {
+                if (vitalsRecord.empty()) {
+                    continue;
+                }
+
+                stringstream vitalsStream{ vitalsRecord };
+
+                string bodyTemperatureString{};
+                string bloodPressureString{};
+                string heartRateString{};
+                string respiratoryRateString{};
+
+                getline(vitalsStream, bodyTemperatureString, ',');
+                getline(vitalsStream, bloodPressureString, ',');
+                getline(vitalsStream, heartRateString, ',');
+                getline(vitalsStream, respiratoryRateString, ',');
+
+                float bodyTemperature = stof(bodyTemperatureString);
+                int bloodPressure = stoi(bloodPressureString);
+                int heartRate = stoi(heartRateString);
+                int respiratoryRate = stoi(respiratoryRateString);
+
+                Vitals* vitals = new Vitals(
+                    bodyTemperature,
+                    bloodPressure,
+                    heartRate,
+                    respiratoryRate
+                );
+
+                patient->addVitals(vitals);
+            }
+        }
+
+        patients.push_back(patient);
+    }
+
+    inFile.close();
+
     return patients;
+
 }
