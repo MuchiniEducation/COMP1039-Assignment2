@@ -11,6 +11,34 @@
 
 using namespace std;
 
+void replaceAll(
+    std::string& text,
+    const std::string& oldValue,
+    const std::string& newValue
+)
+{
+    size_t position{ text.find(oldValue) };
+
+    while (position != std::string::npos) {
+        text.replace(position, oldValue.length(), newValue);
+        position = text.find(oldValue, position + newValue.length());
+    }
+}
+
+std::string normaliseDiagnosisName(const std::string& diagnosis)
+{
+    std::string normalisedDiagnosis{ diagnosis };
+
+    // Handle UTF-8 curly apostrophes.
+    replaceAll(normalisedDiagnosis, "\xE2\x80\x99", "'");
+    replaceAll(normalisedDiagnosis, "\xE2\x80\x98", "'");
+
+    // Handle the common Windows console mojibake display of curly apostrophes.
+    replaceAll(normalisedDiagnosis, "ΓÇÖ", "'");
+    replaceAll(normalisedDiagnosis, "ΓÇÿ", "'");
+
+    return normalisedDiagnosis;
+}
 
 std::vector<Patient*> PatientFileLoader::loadPatientFile(const std::string& file)
 {
@@ -43,6 +71,8 @@ std::vector<Patient*> PatientFileLoader::loadPatientFile(const std::string& file
         getline(lineStream, birthdayString, '|');
         getline(lineStream, diagnosis, '|');
         getline(lineStream, vitalsString, '|');
+
+        diagnosis = normaliseDiagnosisName(diagnosis);
 
         stringstream nameStream{ name };
 
