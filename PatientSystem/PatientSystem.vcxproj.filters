@@ -48,6 +48,15 @@
     <ClCompile Include="CompositePatientLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CordycepsAlertStrategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KepralsAlertStrategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AndromedaAlertStrategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Person.h">
@@ -84,6 +93,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CompositePatientLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AlertLevelStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CordycepsAlertStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KepralsAlertStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AndromedaAlertStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

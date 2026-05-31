@@ -26,7 +26,7 @@ void PatientDatabaseLoader::loadPatients(std::vector<Patient*>& patientIn){
     p->addDiagnosis(Diagnosis::CORDYCEPS_BRAIN_INFECTION);
 
     Vitals* v = new Vitals(37.5f, 80, 60, 16);
-    p->addVitals(v);
+    p->addPreviousVitals(v);
 
     patientIn.push_back(p);
 

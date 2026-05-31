@@ -1,4 +1,7 @@
 #include "Patient.h"
+#include "AndromedaAlertStrategy.h"
+#include "CordycepsAlertStrategy.h"
+#include "KepralsAlertStrategy.h"
 
 #include <iomanip>
 #include <iostream>
@@ -10,13 +13,14 @@
 using namespace std;
 
 const std::string Diagnosis::CORDYCEPS_BRAIN_INFECTION = "Cordyceps Brain Infection";
-const std::string Diagnosis::KEPRALS_SYNDROME = "Kepral’s Syndrome";
+const std::string Diagnosis::KEPRALS_SYNDROME = "Kepral's Syndrome";
 const std::string Diagnosis::ANDROMEDA_STRAIN= "Andromeda Strain";
 
 
 Patient::Patient(const std::string& firstName, const std::string& lastName, std::tm birthday) :
 	Person(firstName, lastName, birthday),
-	_alertLevel(AlertLevel::Green)
+	_alertLevel(AlertLevel::Green),
+	_alertStrategy{ nullptr }
 {
 }
 
@@ -59,6 +63,20 @@ std::ostream& operator<<(std::ostream& os, const Patient& p)
 void Patient::addDiagnosis(const std::string& diagnosis)
 {
 	_diagnosis.push_back(diagnosis);
+
+	if (_alertStrategy != nullptr) {
+		return;
+	}
+
+	if (diagnosis == Diagnosis::CORDYCEPS_BRAIN_INFECTION) {
+		_alertStrategy = std::make_unique<CordycepsAlertStrategy>();
+	}
+	else if (diagnosis == Diagnosis::KEPRALS_SYNDROME) {
+		_alertStrategy = std::make_unique<KepralsAlertStrategy>();
+	}
+	else if (diagnosis == Diagnosis::ANDROMEDA_STRAIN) {
+		_alertStrategy = std::make_unique<AndromedaAlertStrategy>();
+	}
 }
 
 const std::string& Patient::primaryDiagnosis() const
@@ -69,7 +87,15 @@ const std::string& Patient::primaryDiagnosis() const
 void Patient::addVitals(const Vitals* v)
 {
 	_vitals.push_back(v);
-	// TODO: calculate alert levels
+	
+	if (_alertStrategy != nullptr) {
+		setAlertLevel(_alertStrategy->calculateAlertLevel(*this, *v));
+	}
+}
+
+void Patient::addPreviousVitals(const Vitals* v)
+{
+	_vitals.push_back(v);
 }
 
 const std::vector<const Vitals*> Patient::vitals() const

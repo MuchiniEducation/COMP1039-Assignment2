@@ -122,7 +122,7 @@ std::vector<Patient*> PatientFileLoader::loadPatientFile(const std::string& file
                     respiratoryRate
                 );
 
-                patient->addVitals(vitals);
+                patient->addPreviousVitals(vitals);
             }
         }
 

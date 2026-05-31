@@ -1,5 +1,6 @@
 #pragma once
 #include "Person.h"
+#include "AlertLevelStrategy.h"
 
 #include <memory>
 #include <vector>
@@ -43,6 +44,9 @@ public:
 	void addVitals(const Vitals* v);
 	const std::vector<const Vitals*> vitals() const;
 
+    // record the patient's historical vitals records
+	void addPreviousVitals(const Vitals* v);
+
 	// patients have an alert level (green, yellow, orange, red) calculated from their disease and and their last vitals
 	void setAlertLevel(AlertLevel level);
 	const AlertLevel alertLevel() const { return _alertLevel; }
@@ -51,6 +55,7 @@ protected:
 	std::vector<std::string> _diagnosis;
 	std::vector<const Vitals*> _vitals;
 	AlertLevel _alertLevel;
+	std::unique_ptr<AlertLevelStrategy> _alertStrategy;
 
 	friend std::ostream& operator<<(std::ostream& os, const Patient& p);
 };
