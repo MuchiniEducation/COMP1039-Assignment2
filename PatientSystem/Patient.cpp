@@ -2,12 +2,14 @@
 #include "AndromedaAlertStrategy.h"
 #include "CordycepsAlertStrategy.h"
 #include "KepralsAlertStrategy.h"
+#include "PatientAlertObserver.h"
+#include "Vitals.h"
 
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
-#include "Vitals.h"
 
 
 using namespace std;
@@ -105,10 +107,12 @@ const std::vector<const Vitals*> Patient::vitals() const
 
 void Patient::setAlertLevel(AlertLevel level)
 {
+	const AlertLevel previousAlertLevel{ _alertLevel };
+
 	_alertLevel = level;
 
 	if (_alertLevel > AlertLevel::Green) {
-		cout << "Patient: " << humanReadableID() << "has an alert level: ";
+		cout << "Patient: " << humanReadableID() << " has an alert level: ";
 		switch (_alertLevel) {
 		case AlertLevel::Yellow:
 			cout << "Yellow";
@@ -119,7 +123,34 @@ void Patient::setAlertLevel(AlertLevel level)
 		case AlertLevel::Red:
 			cout << "Red";
 			break;
+		default:
+			break;
 		}
 		cout << endl;
+	}
+
+	if (previousAlertLevel != AlertLevel::Red && _alertLevel == AlertLevel::Red) {
+		notifyObservers();
+	}
+}
+
+void Patient::addObserver(PatientAlertObserver* observer)
+{
+	_observers.push_back(observer);
+}
+
+void Patient::removeObserver(PatientAlertObserver* observer)
+{
+	auto position = std::find(_observers.begin(), _observers.end(), observer);
+
+	if (position != _observers.end()) {
+		_observers.erase(position);
+	}
+}
+
+void Patient::notifyObservers()
+{
+	for (PatientAlertObserver* observer : _observers) {
+		observer->update(this);
 	}
 }

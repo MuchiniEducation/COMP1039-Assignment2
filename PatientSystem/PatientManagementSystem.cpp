@@ -10,6 +10,9 @@
 #include "Vitals.h"
 #include "CompositePatientLoader.h"
 #include "PatientFileLoaderAdapter.h"
+#include "GPAlertObserver.h"
+#include "HospitalAlertObserver.h"
+#include "PatientAlertObserver.h"
 
 #include "GPNotificationSystemFacade.h"
 #include "HospitalAlertSystemFacade.h"
@@ -50,8 +53,13 @@ void PatientManagementSystem::init()
 		_patientLookup[p->uid()] = p;
 	}
 
-	for (Patient* p : _patients) {
-		// TODO: do any processing you need here
+	_patientAlertObservers.push_back(std::make_unique<HospitalAlertObserver>());
+	_patientAlertObservers.push_back(std::make_unique<GPAlertObserver>());
+
+	for (Patient* patient : _patients) {
+		for (const std::unique_ptr<PatientAlertObserver>& observer : _patientAlertObservers) {
+			patient->addObserver(observer.get());
+		}
 	}
 }
 
