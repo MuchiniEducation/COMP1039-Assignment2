@@ -8,6 +8,8 @@
 #include "PatientDatabaseLoader.h"
 #include "PatientFileLoaderAdapter.h"
 #include "Vitals.h"
+#include "CompositePatientLoader.h"
+#include "PatientFileLoaderAdapter.h"
 
 #include "GPNotificationSystemFacade.h"
 #include "HospitalAlertSystemFacade.h"
@@ -16,10 +18,18 @@ using namespace std;
 
 
 PatientManagementSystem::PatientManagementSystem() :
-	_patientDatabaseLoader(std::make_unique<PatientFileLoaderAdapter>("patients.txt")),
-	_hospitalAlertSystem(std::make_unique<HospitalAlertSystemFacade>()),
-	_gpNotificationSystem(std::make_unique<GPNotificationSystemFacade>())
+	_patientDatabaseLoader{ nullptr },
+	_hospitalAlertSystem{ std::make_unique<HospitalAlertSystemFacade>() },
+	_gpNotificationSystem{ std::make_unique<GPNotificationSystemFacade>() }
 {
+	std::unique_ptr<CompositePatientLoader> loader{
+		std::make_unique<CompositePatientLoader>()
+	};
+
+	loader->addLoader(std::make_unique<PatientDatabaseLoader>());
+	loader->addLoader(std::make_unique<PatientFileLoaderAdapter>("patients.txt"));
+
+	_patientDatabaseLoader = std::move(loader);
 	_patientDatabaseLoader->initialiseConnection();
 }
 

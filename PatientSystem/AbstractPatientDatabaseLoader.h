@@ -9,6 +9,7 @@ class AbstractPatientDatabaseLoader {
 public:
 	// initialise the database connection
 	virtual void initialiseConnection() = 0;
+	virtual ~AbstractPatientDatabaseLoader() = default;
 
 	// load patients from that database.
 	// This method should allocated dynamic (i.e. new-ed) Patients into
